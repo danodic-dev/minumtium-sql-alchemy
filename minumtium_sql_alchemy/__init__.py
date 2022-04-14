@@ -140,14 +140,15 @@ class EngineFactory:
 
     @staticmethod
     def get_engine(engine_type: str, config=None):
-        if (engine := engine_type.strip().upper()) not in EngineFactory.engines:
-            match engine:
-                case "SQLITE_MEMORY":
-                    EngineFactory.engines[engine] = EngineFactory.create_sqlite_memory()
-                case "POSTGRES":
-                    EngineFactory.engines[engine] = EngineFactory.create_postgres(config)
-                case _:
-                    raise InvalidRelationalDatabaseType(f'Invalid engine type: {engine_type}')
+        engine = engine_type.strip().upper()
+        if engine not in EngineFactory.engines:
+            try:
+                EngineFactory.engines[engine] = {
+                    'SQLITE_MEMORY': EngineFactory.create_sqlite_memory,
+                    'POSTGRES': EngineFactory.create_postgres
+                }[engine]()
+            except KeyError as e:
+                raise InvalidRelationalDatabaseType(f'Invalid engine type: {engine_type}')
         return EngineFactory.engines[engine]
 
     @staticmethod

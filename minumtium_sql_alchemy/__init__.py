@@ -148,7 +148,7 @@ class EngineFactory:
                     'POSTGRES': EngineFactory.create_postgres
                 }[engine]()
             except KeyError as e:
-                raise InvalidRelationalDatabaseType(f'Invalid engine type: {engine_type}')
+                raise InvalidRelationalDatabaseType(f'Invalid engine type: {engine_type}') from e
         return EngineFactory.engines[engine]
 
     @staticmethod

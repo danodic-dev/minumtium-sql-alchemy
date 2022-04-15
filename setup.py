@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="minumtium_sql_alchemy",
-    version="1.0.0",
+    version="1.0.1",
     author="Danilo Guimaraes (danodic)",
     author_email="danilo@danodic.dev",
     description="A SQL Alchemy adapter for the minumtium library.",

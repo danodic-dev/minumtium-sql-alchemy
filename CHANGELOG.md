@@ -7,8 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [1.0.0] - 2022-04-13
+## [1.0.1] - 2022-04-15
+### Fixed
 
+- Fixed issue with migration discovery.
+
+## [1.0.0] - 2022-04-13
 ### Added
 
 - A minimal database migration system.

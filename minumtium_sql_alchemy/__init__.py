@@ -10,7 +10,6 @@ from minumtium_sql_alchemy.migrations import apply_migrations
 
 class SqlAlchemyAdapter(DatabaseAdapter):
     metadata_obj = None
-    migrated: bool = False
 
     def __init__(self, config: Dict, table_name: str, engine=None):
         self.engine = engine
@@ -22,16 +21,15 @@ class SqlAlchemyAdapter(DatabaseAdapter):
 
     def initialize(self, config: Dict, collection_name: str):
         engine = self.engine or EngineFactory.get_engine(config['engine'], config)
-        self._migrate()
-        return engine
+        self._migrate(engine)
+        self.engine = engine
 
     def _setup_metadata(self, engine):
         if SqlAlchemyAdapter.metadata_obj is None:
             SqlAlchemyAdapter.metadata_obj = MetaData(bind=engine)
 
-    def _migrate(self):
-        if not SqlAlchemyAdapter.migrated:
-            apply_migrations(self.engine)
+    def _migrate(self, engine):
+        apply_migrations(engine)
 
     @staticmethod
     def _cast_id(value):

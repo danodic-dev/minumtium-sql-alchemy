@@ -1,6 +1,5 @@
-## minumtium-sql-alchemy 1.0.0
+## minumtium-sql-alchemy 1.0.1
 
-### Added
+### Fixed
 
-- A minimal database migration system.
-- The SQL Alchemy adapter class.
+- Fixed issue with migration discovery.

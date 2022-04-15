@@ -34,7 +34,7 @@ def update_database_version(engine, version: int):
 
 def apply_migrations(engine, migrations: List[MigrationVersion] = None):
     if not migrations:
-        migrations = [Migration() for Migration in MigrationVersion.__subclasses__()]
+        migrations = [Migration() for Migration in get_versions()]
 
     if not migrations:
         return

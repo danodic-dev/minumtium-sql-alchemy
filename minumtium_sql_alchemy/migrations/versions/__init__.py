@@ -1,6 +1,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Type, List
+from . import *
+
+
+def get_versions() -> List[Type]:
+    from .version_0 import Version0
+    from .version_1 import Version1
+    return [Version0, Version1]
 
 
 class MigrationVersion(ABC):

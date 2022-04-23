@@ -10,8 +10,8 @@ class Version0(MigrationVersion):
     def get_version(self) -> int:
         return 0
 
-    def do(self, engine) -> None:
-        meta = MetaData()
+    def do(self, engine, schema=None) -> None:
+        meta = MetaData(schema=schema)
         table = Table(
             MIGRATION_TABLE_NAME, meta,
             Column('version', Integer)
@@ -22,6 +22,6 @@ class Version0(MigrationVersion):
         session.execute(table.insert().values({'version': 0}))
         session.commit()
 
-    def undo(self, engine) -> None:
+    def undo(self, engine, schema=None) -> None:
         meta = MetaData()
         meta.drop_all(bind=engine, tables=[MIGRATION_TABLE_NAME])

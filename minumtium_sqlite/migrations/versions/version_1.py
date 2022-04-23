@@ -10,14 +10,14 @@ class Version1(MigrationVersion):
     def get_version(self) -> int:
         return 1
 
-    def do(self, engine) -> None:
-        meta = MetaData()
+    def do(self, engine, schema=None) -> None:
+        meta = MetaData(schema=schema)
 
         Table(
             USERS_TABLE_NAME, meta,
             Column('id', Integer, primary_key=True, autoincrement=True),
             Column('username', String(128), nullable=False),
-            Column('password', String(512), nullable=False)
+            Column('encrypted_password', String(512), nullable=False)
         )
 
         Table(
@@ -31,6 +31,6 @@ class Version1(MigrationVersion):
 
         meta.create_all(engine)
 
-    def undo(self, engine) -> None:
-        meta = MetaData()
+    def undo(self, engine, schema=None) -> None:
+        meta = MetaData(schema=schema)
         meta.drop_all(bind=engine, tables=['users, posts'])

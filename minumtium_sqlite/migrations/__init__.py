@@ -20,9 +20,9 @@ def get_database_version(engine):
             return int(result['version'])
 
 
-def run_migrations(migrations, engine):
+def run_migrations(migrations, engine, schema):
     for migration in migrations:
-        migration.do(engine)
+        migration.do(engine, schema)
 
 
 def update_database_version(engine, version: int):
@@ -32,7 +32,7 @@ def update_database_version(engine, version: int):
             connection.execute(text(f"INSERT INTO {MIGRATION_TABLE_NAME} VALUES(:version)"), {'version': version})
 
 
-def apply_migrations(engine, migrations: List[MigrationVersion] = None):
+def apply_migrations(engine, schema=None, migrations: List[MigrationVersion] = None):
     if not migrations:
         migrations = [Migration() for Migration in get_versions()]
 
@@ -42,12 +42,12 @@ def apply_migrations(engine, migrations: List[MigrationVersion] = None):
     migrations = sorted(migrations)
 
     if not has_version_table(engine):
-        run_migrations(migrations, engine)
+        run_migrations(migrations, engine, schema)
         update_database_version(engine, migrations[-1].get_version())
         return
 
     version = get_database_version(engine)
     to_run = migrations[version + 1:]
     if to_run:
-        run_migrations(to_run, engine)
+        run_migrations(to_run, engine, schema)
         update_database_version(engine, to_run[-1].get_version())

@@ -6,12 +6,12 @@ import pytest
 from minumtium.infra.database import DataNotFoundException
 from sqlalchemy import text, inspect
 
-from minumtium_sql_alchemy import SqlAlchemyAdapter
-from minumtium_sql_alchemy.migrations import MIGRATION_TABLE_NAME
-from minumtium_sql_alchemy.migrations.versions.version_1 import Version1, USERS_TABLE_NAME, POSTS_TABLE_NAME
+from minumtium_sqlite import MinumtiumSQLiteAdapter, MinumtiumSQLiteAdapterConfig
+from minumtium_sqlite.migrations import MIGRATION_TABLE_NAME
+from minumtium_sqlite.migrations.versions.version_1 import Version1, USERS_TABLE_NAME, POSTS_TABLE_NAME
 
 
-def test_adapter_initialize(adapter: SqlAlchemyAdapter):
+def test_adapter_initialize(adapter: MinumtiumSQLiteAdapter):
     assert inspect(adapter.engine).has_table(MIGRATION_TABLE_NAME)
     assert inspect(adapter.engine).has_table(USERS_TABLE_NAME)
     assert inspect(adapter.engine).has_table(POSTS_TABLE_NAME)
@@ -23,7 +23,7 @@ def test_adapter_initialize(adapter: SqlAlchemyAdapter):
             assert result['version'] == Version1().get_version()
 
 
-def test_adapter_find_by_id(adapter_with_data: SqlAlchemyAdapter):
+def test_adapter_find_by_id(adapter_with_data: MinumtiumSQLiteAdapter):
     with adapter_with_data.engine.connect() as connection:
         with connection.begin():
             result = connection.execute(
@@ -32,37 +32,37 @@ def test_adapter_find_by_id(adapter_with_data: SqlAlchemyAdapter):
             assert result['version'] == Version1().get_version()
 
 
-def test_find_by_id(adapter_with_data: SqlAlchemyAdapter):
+def test_find_by_id(adapter_with_data: MinumtiumSQLiteAdapter):
     data = adapter_with_data.find_by_id('2')
     assert data == {'id': '2',
                     'title': 'This is the third post',
                     'author': 'danodic',
-                    'timestamp': datetime(2022, 2, 22, 10, 22, 22, 222222),
+                    'timestamp': '2022-02-22 10:22:22.222222',
                     'body': 'This is a sample post.'}
 
 
-def test_find_by_id_invalid_id(adapter_with_data: SqlAlchemyAdapter):
+def test_find_by_id_invalid_id(adapter_with_data: MinumtiumSQLiteAdapter):
     with pytest.raises(DataNotFoundException) as e:
         adapter_with_data.find_by_id('200')
         assert e.type is DataNotFoundException
         assert e.value.args[0] == f'No data found at posts for id: -1'
 
 
-def test_find_by_criteria(adapter_with_data: SqlAlchemyAdapter):
+def test_find_by_criteria(adapter_with_data: MinumtiumSQLiteAdapter):
     data = adapter_with_data.find_by_criteria({'body': 'This is a different criteria.'})
     assert data == [{'id': '8',
                      'title': 'This is the ninetieth post',
                      'author': 'danodic',
-                     'timestamp': datetime(2022, 2, 22, 4, 22, 22, 222222),
+                     'timestamp': '2022-02-22 04:22:22.222222',
                      'body': 'This is a different criteria.'},
                     {'id': '9',
                      'title': 'This is the tenth post',
                      'author': 'danodic',
-                     'timestamp': datetime(2022, 2, 22, 3, 22, 22, 222222),
+                     'timestamp': '2022-02-22 03:22:22.222222',
                      'body': 'This is a different criteria.'}]
 
 
-def test_find_by_criteria_invalid_criteria(adapter_with_data: SqlAlchemyAdapter):
+def test_find_by_criteria_invalid_criteria(adapter_with_data: MinumtiumSQLiteAdapter):
     criteria = {'body': 'This is an invalid criteria.'}
     with pytest.raises(DataNotFoundException) as e:
         adapter_with_data.find_by_criteria(criteria)
@@ -70,7 +70,7 @@ def test_find_by_criteria_invalid_criteria(adapter_with_data: SqlAlchemyAdapter)
         assert e.value.args[0] == f'No data found for the following criteria: {str(criteria)}'
 
 
-def test_insert(adapter_with_data: SqlAlchemyAdapter):
+def test_insert(adapter_with_data: MinumtiumSQLiteAdapter):
     data = {'title': 'This is the tenth post',
             'author': 'danodic',
             'timestamp': datetime(2022, 2, 22, 3, 22, 22, 222222),
@@ -89,7 +89,7 @@ def test_insert(adapter_with_data: SqlAlchemyAdapter):
             assert result == data
 
 
-def test_all(adapter_with_data: SqlAlchemyAdapter, posts_data: List[Dict]):
+def test_all(adapter_with_data: MinumtiumSQLiteAdapter, posts_data: List[Dict]):
     results = adapter_with_data.all()
     assert len(results) == 10
 
@@ -97,7 +97,7 @@ def test_all(adapter_with_data: SqlAlchemyAdapter, posts_data: List[Dict]):
     assert results == data
 
 
-def test_all_limit(adapter_with_data: SqlAlchemyAdapter, posts_data: List[Dict]):
+def test_all_limit(adapter_with_data: MinumtiumSQLiteAdapter, posts_data: List[Dict]):
     results = adapter_with_data.all(limit=2)
     assert len(results) == 2
 
@@ -105,14 +105,14 @@ def test_all_limit(adapter_with_data: SqlAlchemyAdapter, posts_data: List[Dict])
     assert results == data
 
 
-def test_all_skip(adapter_with_data: SqlAlchemyAdapter):
+def test_all_skip(adapter_with_data: MinumtiumSQLiteAdapter):
     results = adapter_with_data.all(skip=2)
     assert len(results) == 8
     assert results[0]['id'] == '2'
     assert results[7]['id'] == '9'
 
 
-def test_all_skip_and_limit(adapter_with_data: SqlAlchemyAdapter, posts_data: List[Dict]):
+def test_all_skip_and_limit(adapter_with_data: MinumtiumSQLiteAdapter, posts_data: List[Dict]):
     results = adapter_with_data.all(limit=2, skip=2)
     assert len(results) == 2
 
@@ -120,24 +120,24 @@ def test_all_skip_and_limit(adapter_with_data: SqlAlchemyAdapter, posts_data: Li
     assert results == data
 
 
-def test_summary(adapter_with_data: SqlAlchemyAdapter):
+def test_summary(adapter_with_data: MinumtiumSQLiteAdapter):
     posts = adapter_with_data.summary(projection=['id', 'title'])
     assert posts[0] == {'id': '0', 'title': 'This is the first post'}
     assert posts[1] == {'id': '1', 'title': 'This is the second post'}
     assert posts[9] == {'id': '9', 'title': 'This is the tenth post'}
 
 
-def test_summary_limit(adapter_with_data: SqlAlchemyAdapter):
+def test_summary_limit(adapter_with_data: MinumtiumSQLiteAdapter):
     first_post, second_post = adapter_with_data.summary(projection=['id', 'title'], limit=2)
     assert first_post == {'id': '0', 'title': 'This is the first post'}
     assert second_post == {'id': '1', 'title': 'This is the second post'}
 
 
-def test_count(adapter_with_data: SqlAlchemyAdapter):
+def test_count(adapter_with_data: MinumtiumSQLiteAdapter):
     assert adapter_with_data.count() == 10
 
 
-def test_delete(adapter_with_data: SqlAlchemyAdapter):
+def test_delete(adapter_with_data: MinumtiumSQLiteAdapter):
     adapter_with_data.delete('0')
 
     with adapter_with_data.engine.connect() as connection:
@@ -146,7 +146,7 @@ def test_delete(adapter_with_data: SqlAlchemyAdapter):
     assert len(result) == 0
 
 
-def test_delete_no_data(adapter_with_data: SqlAlchemyAdapter):
+def test_delete_no_data(adapter_with_data: MinumtiumSQLiteAdapter):
     adapter_with_data.delete('0')
 
     # Should just not raise an exception
@@ -155,6 +155,7 @@ def test_delete_no_data(adapter_with_data: SqlAlchemyAdapter):
 
 def cast_id(value):
     value['id'] = str(value['id'])
+    value['timestamp'] = str(value['timestamp'])
     return value
 
 
@@ -212,13 +213,18 @@ def posts_data() -> List[Dict]:
              'body': 'This is a different criteria.'}]
 
 
-@pytest.fixture(scope='function')
-def adapter(database) -> SqlAlchemyAdapter:
-    return SqlAlchemyAdapter({}, 'posts', engine=database)
+@pytest.fixture()
+def config() -> MinumtiumSQLiteAdapterConfig:
+    return MinumtiumSQLiteAdapterConfig()
 
 
 @pytest.fixture(scope='function')
-def adapter_with_data(adapter, posts_data) -> SqlAlchemyAdapter:
+def adapter(database, config: MinumtiumSQLiteAdapterConfig) -> MinumtiumSQLiteAdapter:
+    return MinumtiumSQLiteAdapter(config, 'posts', engine=database)
+
+
+@pytest.fixture(scope='function')
+def adapter_with_data(adapter, posts_data) -> MinumtiumSQLiteAdapter:
     def insert_record(data, engine):
         with engine.connect() as connection:
             with connection.begin():

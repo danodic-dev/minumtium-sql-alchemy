@@ -4,11 +4,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="minumtium_sql_alchemy",
+    name="minumtium_sqlite",
     version="1.0.1",
     author="Danilo Guimaraes (danodic)",
     author_email="danilo@danodic.dev",
-    description="A SQL Alchemy adapter for the minumtium library.",
+    description="A SQLite adapter for the minumtium library.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/danodic-dev/minumtium-sql-alchemy",

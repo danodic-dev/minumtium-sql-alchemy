@@ -1,26 +1,27 @@
-# Minumtium SQL Alchemy
+# Minumtium SQLite
 
-A relational database adapter for the [minumtium](https://github.com/danodic-dev/minumtium) library.
+A SQLite adapter for the [minumtium](https://github.com/danodic-dev/minumtium) library. It uses SQL Alchemy as its
+abstraction library.
 
 ### What can I use it for?
 
 It is used to provide access to data using relational databases using
-the [minumtium](https://github.com/danodic-dev/minumtium) library.
+the[minumtium](https://github.com/danodic-dev/minumtium) library.
 
 ## Usage
 
 Install it using your favorite package manager:
 
 ```commandline
-pip install minumtium-sql-alchemy
+pip install minumtium-sqlite
 ```
 
 ```commandline
-pipenv install minumtium-sql-alchemy
+pipenv install minumtium-sqlite
 ```
 
 ```commandline
-poetry install minumtium-sql-alchemy
+poetry install minumtium-sqlite
 ```
 
 Then, provide it to your minumtium Service:

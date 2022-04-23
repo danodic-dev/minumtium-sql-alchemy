@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="minumtium_sqlite",
-    version="1.0.1",
+    version="1.0.2",
     author="Danilo Guimaraes (danodic)",
     author_email="danilo@danodic.dev",
     description="A SQLite adapter for the minumtium library.",
@@ -22,6 +22,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     packages=setuptools.find_packages(),
-    install_requires=['sqlalchemy', 'minumtium'],
+    install_requires=['sqlalchemy', 'minumtium', 'pydantic'],
     python_requires=">=3.6",
 )

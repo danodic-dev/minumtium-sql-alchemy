@@ -7,9 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.2] - 2022-04-23
+### Changed
+- Changed project name from minumtium-sql-alchemy to minumtium-sqlite.
+- Improved error handling
+- Improved column casting using sqlalchemy
+
 ## [1.0.1] - 2022-04-15
 ### Fixed
-
 - Fixed issue with migration discovery.
 
 ## [1.0.0] - 2022-04-13

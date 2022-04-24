@@ -40,9 +40,7 @@ jobs:
       - name: Setup Environment
         run: pipenv install --dev
       - name: Unit Tests
-        run: pipenv run python -m pytest ./tests/ --cov=tests/ --cov-report xml:coverage.xml
-      - name: Coverage Report
-        run: pipenv run python -m coverage xml -i
+        run: pipenv run python -m pytest ./tests/
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

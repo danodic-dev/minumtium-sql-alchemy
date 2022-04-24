@@ -11,7 +11,7 @@ class Version0(MigrationVersion):
         return 0
 
     def do(self, engine, schema=None) -> None:
-        meta = MetaData(schema=schema)
+        meta = MetaData()
         table = Table(
             MIGRATION_TABLE_NAME, meta,
             Column('version', Integer)

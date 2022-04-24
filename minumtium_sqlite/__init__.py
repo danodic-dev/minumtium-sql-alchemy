@@ -18,12 +18,12 @@ class MinumtiumSQLiteAdapter(DatabaseAdapter):
 
     def __init__(self, config: MinumtiumSQLiteAdapterConfig, table_name: str, engine: Engine = None):
         self.engine = self.initialize(config, engine)
-        self.metadata_obj = MetaData(bind=self.engine, schema=config.schema_name)
+        self.metadata_obj = MetaData(bind=self.engine)
         self.table_name = table_name
-        self.table = Table(table_name, self.metadata_obj, autoload=True, schema=config.schema_name)
+        self.table = Table(table_name, self.metadata_obj, autoload=True)
 
         self.cast_columns = self._setup_cast_columns(self.table)
-        self.summary_columns = self._setup_summary_columns(self.table)
+        self.summary_columns_value = None
 
     def initialize(self, config: MinumtiumSQLiteAdapterConfig, engine: Engine = None):
         engine = engine or self._create_engine()
@@ -40,11 +40,13 @@ class MinumtiumSQLiteAdapter(DatabaseAdapter):
 
     @staticmethod
     def _setup_cast_columns(table):
-        return [cast(table.c.id, String()),
-                table.c.title,
-                table.c.body,
-                table.c.author,
-                cast(table.c.timestamp, String())]
+        columns = []
+        for name, column in table.c.items():
+            if name in ['id', 'timestamp']:
+                columns.append(cast(column, String()))
+                continue
+            columns.append(column)
+        return columns
 
     @staticmethod
     def _setup_summary_columns(table):
@@ -56,6 +58,12 @@ class MinumtiumSQLiteAdapter(DatabaseAdapter):
     @staticmethod
     def _cast_results(query_results):
         return [dict(result) for result in query_results]
+
+    @property
+    def summary_columns(self):
+        if not self.summary_columns_value:
+            self.summary_columns_value = self._setup_summary_columns()
+        return self.summary_columns_value
 
     def find_by_id(self, id: str):
         statement = (self.table
